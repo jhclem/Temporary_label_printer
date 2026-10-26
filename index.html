@@ -74,19 +74,37 @@
             padding: 1.5mm 2mm;
             box-sizing: border-box;
             border: 1px dashed #999;
-            display: grid;
-            grid-template-columns: 1fr 25mm;   /* content | QR */
-            column-gap: 2mm;
+            display: flex;
+            flex-direction: column;
             overflow: hidden;
             font-family: Arial, sans-serif;
         }
 
-        /* Left content column */
-        .label-content {
+        .label-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            gap: 2mm;
+            height: 11.5mm;
+            border-bottom: 1.5px solid #000;
+            padding-bottom: 0.4mm;
+            flex-shrink: 0;
+        }
+        .top-left {
             display: flex;
             flex-direction: column;
             justify-content: space-between;
-            min-width: 0;            /* allows text truncation inside grid */
+            height: 100%;
+            min-width: 0;
+        }
+
+        .label-body {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            padding-top: 0.8mm;
+            min-height: 0;
             overflow: hidden;
         }
 
@@ -111,12 +129,10 @@
 
         /* Part Number */
         .part-number {
-            font-size: 11pt;
+            font-size: 12pt;
             font-weight: bold;
             color: #000;
             line-height: 1.1;
-            border-bottom: 1.5px solid #000;
-            padding-bottom: 0.3mm;
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
@@ -124,7 +140,7 @@
 
         /* Description: max 2 lines */
         .description {
-            font-size: 6.5pt;
+            font-size: 7pt;
             color: #222;
             line-height: 1.15;
             max-height: 2.3em;
@@ -175,16 +191,11 @@
             gap: 2.5mm;
         }
 
-        /* Right QR column (full label height) */
-        .qr-col {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
         .qr-code-img {
-            width: 25mm;
-            height: 25mm;
+            width: 10.5mm;
+            height: 10.5mm;
             object-fit: contain;
+            flex-shrink: 0;
         }
 
         /* --- Print Styles --- */
@@ -256,12 +267,17 @@
             const labelDiv = document.createElement('div');
             labelDiv.className = 'label';
             labelDiv.innerHTML = `
-                <div class="label-content">
-                    <div class="label-header">
-                        <img class="logo" alt="SLB Logo" src="${LOGO_URL}">
-                        <span class="entity-name">${ENTITY_NAME}</span>
+                                <div class="label-top">
+                    <div class="top-left">
+                        <div class="label-header">
+                            <img class="logo" alt="SLB Logo" src="${LOGO_URL}">
+                            <span class="entity-name">${ENTITY_NAME}</span>
+                        </div>
+                        <div class="part-number">${escapeHtml(pn)}</div>
                     </div>
-                    <div class="part-number">${escapeHtml(pn)}</div>
+                    <img class="qr-code-img" alt="QR Code" src="${qrUrl}">
+                </div>
+                <div class="label-body">
                     <div class="description">${escapeHtml(desc)}</div>
                     <div class="wo-sn-row">
                         <div class="wo-left">${wo ? `WO: ${escapeHtml(wo)}` : ''}</div>
@@ -274,9 +290,6 @@
                         </div>
                         ${date ? `<span><strong>DATE:</strong> ${escapeHtml(date)}</span>` : ''}
                     </div>
-                </div>
-                <div class="qr-col">
-                    <img class="qr-code-img" alt="QR Code" src="${qrUrl}">
                 </div>
             `;
             return labelDiv;
